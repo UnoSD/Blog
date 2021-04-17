@@ -11,9 +11,11 @@ This article is **Azure-centric**, but most of what will be discussed will also 
 
 **The code examples below all deploy exactly the same resources**
 
+---
+
 ## ARM templates
 
-Azure-native way of scripting resources; the language used is JSON.
+**Azure-native** way of scripting resources; the language used is **JSON**.
 
 I have worked extensively with **ARM templates**, but I still get an headache when I open one for the first time.
 
@@ -23,9 +25,9 @@ It requires a great deal of boilerplate and, **JSON** being **JSON**, naturally 
 
 The nesting doesn't help and it handles modules poorly.
 
-Enough being negative, what's great about it? It's Azure's mother-tongue. It supports all Azure resources as soon as they are available.
+Enough being negative, what's great about it? It's **Azure**'s mother-tongue. It supports all **Azure** resources as soon as they are available.
 
-In addition, if you use the Azure Resource Explorer, you will find exactly what has been deployed in your subscription and that will be in **JSON** and compatible with your **ARM templates**;
+In addition, if you use the **Azure Resource Explorer**, you will find exactly what has been deployed in your subscription and that will be in **JSON** and compatible with your **ARM templates**;
 
 If you create something in the portal, you can easily export its current configuration as an **ARM template**.
 
@@ -97,7 +99,7 @@ This is a template that creates a **resource group** and a **storage account**:
 
 - Native deployment history tracking
 - Always up to date with new resources
-- Supported by Microsoft
+- Supported by **Microsoft**
 
 ### Cons
 
@@ -105,19 +107,21 @@ This is a template that creates a **resource group** and a **storage account**:
 - Hard to manage modules
 - Complexity increases exponentially for large environments
 
+---
+
 ## Bicep
 
 OK, now take **ARM templates**, remove all the downsides and here you have **Bicep**.
 
-A **Bicep template** is pretty much the same as an **ARM template**, in fact it transpiles to **ARM JSON** to use the same underlying deployment system, but **Bicep** addresses the two main cons of **ARM**.
+A **Bicep template** is pretty much the same as an **ARM template**, in fact it transpiles to **ARM JSON** to use the same underlying deployment system, but **Bicep** addresses the two main cons of **ARM**:
 
 The first massive advantage over **ARM** is the language; it's a bespoke DSL, easy to write and understand.
 
-Modularisation is also easier than **ARM** as it allows to reference other templates in the file system.
+Modularisation is also easier than **ARM** as it allows to reference other templates in the same container (also same directory locally).
 
-Being the same as **ARM** means also that is Azure-only, which, currently, is the main drawback.
+Being the same as **ARM** means also that is **Azure-only**, which, currently, is the main drawback.
 
-Same resources from the **ARM template** above, but in **Bicep**:
+Same resources from the **ARM template** above, but in **Bicep** this time:
 
 ```bicep
 targetScope = 'subscription'
@@ -153,33 +157,36 @@ resource stg 'Microsoft.Storage/storageAccounts@2019-06-01' = {
 }
 ```
 
-Even without syntax highlighting from the blog engine, this immediately looks awesome, way more readable and succinct. In my opinion a great option if you are Azure-only and want to avoid the burden of state management. You will miss out on clean-up of resources that **Pulumi** and **Terraform** achieve with an external state, but it is worth evaluating.
+Even without syntax highlighting from the blog engine, this immediately looks awesome, way more readable and succinct. In my opinion a great option if you are **Azure-only** and want to avoid the burden of state management. You will miss out on clean-up of resources that **Pulumi** and **Terraform** achieve with an external state, but it is worth evaluating.
 
 ### Pros
 
-- Same pros as ARM
+- Same pros as **ARM**
 - Expressive (concise) language
+- Good modularisation support
 
 ### Cons
 
-- Azure-only
+- **Azure-only**
 - No resources clean-up
+
+---
 
 ## Terraform
 
-Terraform is the exceptional attempt at a multi-cloud, human-readable, infrastructure as code tool; a successful attempt; it is quickly becoming the industry standard for cloud deployments.
+**Terraform** is the (first, I believe) exceptional attempt at a multi-cloud, human-readable, infrastructure as code tool; a successful attempt; it is quickly becoming the **industry standard** for cloud deployments.
 
-The **HashiCorp** tool uses an external state storage, this registers all the resources deployed and enables destruction of the resources removed from the templates and clean up of an entire environment.
+The **HashiCorp** tool uses an external state storage, this registers all the resources deployed and enables destruction of the resources removed from the templates and clean up of an entire environment on demand.
 
-Uses a custom DSL called **HCL**, quite friendly and understandable by anyone at a glance.
+Uses a custom DSL called **HCL**, quite friendly and understandable by anyone at a glance without prior training.
 
-One major downside is that is a limited language; it covers the basic conditionals, loops, variables (poorly in my opinion).
+One major downside is that is a limited language; it covers the basic conditionals, loops, variables (poorly, in my opinion).
 
 It's a beautiful solution for simple deployments, but it gets pretty frustrating when attempting to be more clever with the logic.
 
-Same resources as above in **Terraform** this time. I am using **Azure** blob as a state storage, but it has several options including the local file system.
+Same resources as above in the example here, in **Terraform** this time. I am using **Azure** blob as a state storage, but it has several options including the local file system.
 
-One big downside if that often you find yourself in a situation where a new resource or a new feature of a resource comes up in Azure (and I presume the same for other providers), but you have to wait for the **Terraform** team to implement it to leverage it in idiomatic **Terraform**. You can always deploy **ARM templates** from within **Terraform**, but it is ugly and you miss a richer diff experience.
+One big downside is that often you find yourself in a situation where a new resource or a new feature of a resource comes up in **Azure** (and I presume the same for other providers), but you have to wait for the **Terraform** team to implement it to leverage it in idiomatic **Terraform**; you can always deploy **ARM templates** from within **Terraform**, but it is ugly and you miss a richer diff experience.
 
 Modules support in **Terraform** is also great and it allows you to reference modules directly from external **Git** repositories.
 
@@ -243,16 +250,18 @@ resource "azurerm_storage_account" "example" {
 
 ### Pros
 
-- Unofficial industry standard as of 2021
+- Unofficial **industry standard** as of 2021 (endorsed by several organisations)
 - Language and CLI are incredibly easy to understand and to use
 
 ### Cons
 
-- **HCL** has its limits and simple logic can turn into complex templates
+- **HCL** has its limits and simple logic can turn into complex templates (and can be frustrating to code)
 - Storage of the state is in plain text, including secrets; responsibility for securing it lies with the user
 - Tooling and code completion is not always great and misses "compile"-time checks
 - Being an open-source tool, is supported by the community only unless you pay for **Terraform Enterprise**
-- Resources support is delayed and sometimes quite heavily
+- Resources support is delayed, sometimes quite heavily; bugs can stay unfixed for years
+
+---
 
 ## Pulumi
 
@@ -260,25 +269,25 @@ resource "azurerm_storage_account" "example" {
 
 The people at **Pulumi** had a great intuition:
 
-Using general purpose programming languages to define infrastructure.
+Using **general purpose** programming languages to define infrastructure.
 
 It was such a good idea that a few months later, **Terraform** published a preview of its **CDK** to write **Terraform** in **TypeScript** (and I believe they now also support other languages).
 
-With all the pressure for a DevOps culture, this fits really well as it enables developers to use a familiar language to also define infrastructure (it also allow interop between app and infra code)
+With all the pressure for a **DevOps** culture, this fits really well as it enables developers to use a familiar language to also define infrastructure (it also allows interop between apps and infra code)
 
-It supports .NET languages (C#/F#/VB.NET/...), Go, TypeScript, Python.
+It supports **.NET** languages (**C#/F#/VB.NET**/...), **Go**, **TypeScript**, **Python**.
 
 The ability to use the **Azure management SDKs** is not new, we could always do that in those languages, but **Pulumi** manages all the resources and dependencies for us.
 
 You can specify the resources to create in a declarative way; you just build a list of stuff to create and **Pulumi** works out dependencies, changes and everything else for you.
 
-It also features an encryption capability for secrets in the state; can use external providers to encrypt the content moving the responsibility of securing the state more towards the tool.
+It also features an **encryption** capability for secrets in the state; you can use external providers to encrypt the content moving the responsibility of securing the state more towards the tool.
 
 The only downside may be that, for system administrators, picking up a programming language may have a steeper learning curve than learning **HCL** or **Bicep** and you are more likely to find ops talents on the job market that know **Terraform** rather than **C#**.
 
-The support story is similar to **Terraform**, **Pulumi** offers a paid plan for storage, but the actual tool is open-source and community-supported.
+The support story is similar to **Terraform**. **Pulumi** offers a paid plan for storage, but the actual tool is open-source and community-supported.
 
-One feature that **Terraform** has, but it's missing in **Pulumi** is the ability to plan the changes to an output file and then apply that file later; this eliminates the risk of race conditions if you plan and deploy independently and I find it really useful in CD pipelines.
+One feature that **Terraform** has, but it's missing in **Pulumi** is the ability to plan the changes to an output file and then apply that file later; this eliminates the risk of race conditions if you plan and deploy independently and I find it really useful in CD pipelines (I've already created a GitHub issue to request the feature).
 
 There is no roadmap for it at the moment, but if they will support **PowerShell** as a language in the future, that may remove the need for sysadmins to learn a new language and I believe it could ramp up its adoption.
 
@@ -312,15 +321,16 @@ class MyStack : Stack
 
 - The **AzureNative** provider is always up-to-date with new **Azure** resources and features
 - If you are a developer, you do not need to learn a new language
-- It gives you the full power of a real programming language, whatever you can do in C# (or Python etc...) you can do in a **Pulumi** project
+- It gives you the full power of a real programming language, whatever you can do in **C#** (or **Python** etc...) you can do in a **Pulumi** project
 - Great CLI, quiet in the output by default
 
 ### Cons
 
 - Niche, less likely to find experts and documentation is poor
-- More hostile to pick up for sysadmins than Terraform
-- No support packages
+- More hostile to pick up for sysadmins than **Terraform**
 - No output to the planning phase
+
+---
 
 ## Pulumi.FSharp.Extensions
 
@@ -340,7 +350,7 @@ let infra () =
     ));
 ```
 
-So I decided to write an extension to use Pulumi, but make it look even better than **Terraform** in **F#** using computational expressions:
+So I decided to write an extension to use **Pulumi**, but make it look even better and simpler than **Terraform** in **F#** using **computational expressions**:
 
 ```fsharp
 let rg =
@@ -358,9 +368,13 @@ let sa =
     }
 ```
 
+Link to the GitHub repo [here](https://github.com/UnoSD/Pulumi.FSharp.Extensions).
+
 ### Bird's eye view and lines of code
 
-Purely looking at the core of the template, probably **Pulumi** in **C#** is the shorter template, but, being fair, you also have an external **Pulumi.yaml** file with project and state configuration (which is included in my **Terraform** example) and language-specific files such as project files (csproj), solution etc... **Terraform** and **Bicep** are also quite short and the **ARM template** is the most verbose as anticipated.
+Purely looking at the core of the template, probably **Pulumi** in **C#** is the shorter one, but, being fair, you also have an external **Pulumi.yaml** file with project and state configuration (which is included in my **Terraform** example) and language-specific files such as project files (csproj), solution etc... **Terraform** and **Bicep** are also quite short. The **ARM template** is the most verbose as anticipated.
+
+---
 
 ## Other options
 
@@ -370,24 +384,24 @@ A new option that recently came up (announced a few days before this blog post) 
 
 I have not had a chance to play with it and I will update this article later, but **PSArm** seems to answer the prayers of many sysadmins fed up with learning new languages;
 
-It is a way of writing **ARM templates** using idiomatic **PowerShell** which is familiar language to ops.
+It is a way of writing **ARM templates** using idiomatic **PowerShell** which is a familiar language to ops.
 
 It sounds quite appealing to those who want to reuse existing skills to embrace **IaC** and **PowerShell** is almost as flexible as a programming language which may help overcome some limitations of **Terraform**.
 
 ### Farmer
 
-Honourable mention goes to **Farmer** which lets you write nice-looking **F#** that generates **ARM templates**; I have not played with it at all, but I will try to see if there is any advantage in using it over **Pulumi** (and **Pulumi.FSharp.Extensions** if you want it to look pretty). Bear in mind that, generating **ARM** it means that it works only on **Azure**.
+Honourable mention goes to **Farmer** which lets you write nice-looking **F#** that generates **ARM templates**; I have not played with it much, but I will try to see if there is any advantage in using it over **Pulumi** (and **Pulumi.FSharp.Extensions** if you want it to look pretty). Bear in mind that, generating **ARM** it means that it works only on **Azure**.
 
 ### Azure CLI (Bash/PS) and PowerShell (Az module)
 
-In my opinion a less honourable mention, many infrastructure engineers adopted this method because they did not know any better, I personally see no benefits in using this approach as it moves a massive burden towards the engineer;
+In my opinion, a less honourable mention. Many infrastructure engineers adopted this method because they did not know any better (early in the days when **ARM/Terraform/etc** were not so popular or did not exist at all), I personally see no benefits in using this approach nowadays as it moves a massive burden towards the engineer:
 
 You have to worry about dependencies
 You have to worry about error handling
 You have to make sure it is idempotent (and cmdlets not always are)
 ...
 
-I would not recommend this option or the ARM templates route, I believe that there is no compelling reason to write **IaC** in this way. Please let me know in the comments if you have a good use case and I will happily update the article.
+I would not recommend this option or the **ARM templates route** as of today, I believe that there is no compelling reason to write **IaC** in this way. Please let me know in the comments if you have a good use case and I will happily update the article including it.
 
 ### Comparison table
 
@@ -401,19 +415,21 @@ This is a comparison table where I evaluate features for each tool.
 
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xto2uqy9iokwjxarkcxl.png)
 
-That is the difference between getting into a shop and asking for a "chocolate cake with cream filling and 30 candles" and telling the baker: OK, now shake the eggs, mix with sugar, add milk etc...
+That is the difference between getting into a shop and asking for a "*chocolate cake with cream filling and 30 candles*" and telling the baker: *OK, now shake the eggs, mix with sugar, add milk etc...*
 
-Writing declarative code means telling the system what you want, not how to do it. You lose control in favour of a feature-rich simplicity. That results also in less verbosity.
+Writing **declarative** code means telling the system **what** you want, not **how** to do it. You lose (unnecessary) control in favour of a feature-rich simplicity. That results also in less verbosity.
 
-Most of the options are declarative, you can define resources in whichever order you prefer and the tools will work out dependencies and parallelisation for you. They will also manage retries, error handling and so on without having to explicitly code for it.
+Most of the options are **declarative**, you can define resources in whichever order you prefer and the tools will work out dependencies and parallelisation for you. They will also manage retries, error handling and so on without having to explicitly code for it.
 
-The only options that are imperative are **Azure CLI** and **PowerShell** (or directly using the REST API/SDK) to create the resources. I would not recommend this to anyone. It is worth upskilling (if you are a sysadmin) to understand **Pulumi** or **Terraform** and avoid PowerShell (or potentially try **PSArm** or wait for **Pulumi** to support **PowerShell**)
+The only options that are imperative are **Azure CLI** and **PowerShell** (or directly using the **REST API/SDK**) to create the resources. I would not recommend this to anyone. It is worth upskilling (if you are a sysadmin) to understand **Pulumi** or **Terraform** and avoid **PowerShell** (or potentially try **PSArm** or wait for **Pulumi** to support **PowerShell**)
+
+---
 
 ### Idempotency
 
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/xl6icw0nz8iwqq4mmqxx.png)
 
-All the options *can* be idempotent; idempotency means that you can rerun the same deployment as many times as you like and, as long as the resources are unchanged, it will do nothing;
+All the options *can* be **idempotent**; **idempotency** means that you can rerun the same deployment as many times as you like and, as long as the resources are unchanged, it will do nothing;
 
 if a resource drifted away from the configuration or does not exist, it will be picked up.
 
@@ -435,7 +451,7 @@ if a resource is not supported yet, you can temporarily use an **ARM template** 
 
 **ARM** has an awful way of modularising templates, **Bicep** improves that significantly.
 
-**Terraform** works nicely with modules and also supports modules directly from a **Git** repository and **Pulumi** is as good as the language you pick (which is very good for all the languages); you can use **NuGet** packages in **.NET**, **npm** packages with TypeScript, I presume **pip** with **Python** and I am sure that also applies to **Go** with its own package system.
+**Terraform** works nicely with modules and also supports modules directly from a **Git** repository and **Pulumi** is as good as the language you pick (which is very good for all the languages); you can use **NuGet** packages in **.NET**, **npm** packages with **TypeScript**, I presume **pip** with **Python** and I am sure that also applies to **Go** with its own package system.
 
 ### Legacy deployments
 
@@ -449,15 +465,17 @@ From **Terraform** you can invoke commands locally (including **PowerShell/Bash*
 
 **Pulumi**, again, can do whatever **TS/C#/Python/Go** can do; which is pretty much everything your computer can do, including invoking **Terraform**, **REST APIs**, buy a **pizza** on every deployment using your favourite pizza place APIs, feed your cat in your smart home or play a fanfare when a resource is created...
 
+Also worth noting that **Pulumi** has **tf2pulumi**, a tool that converts your **Terraform** to **Pulumi** in your chosen flavour of language, worth also noting that I got an exception the first time I tried using it; I will insist before judging it too harshly, but it did not seem mature enough at the time I tried it.
+
 ### Supportability
 
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/umg3fz7nj3lexenl371b.png)
 
-**ARM/Bicep** are supported by **Microsoft**, not much else to say there, it is a big plus
+**ARM/Bicep** are supported by **Microsoft**, not much else to say there, it is a massive plus.
 
-**Terraform** and **Pulumi** by the community, but you can get a **paid** support plans if you use their storage.
+**Terraform** and **Pulumi** by the community, but you can get a **paid** support plans if you use their storage; although, it may still mean that you are covered for the storage, but if the tooling has a bug you may have to wait in line like any other mere mortal.
 
-**AzCLI/PS** you get the obvious support for the tools, but, if your custom code goes wrong, you're on your own and it will be mostly your custom code that will fail.
+**AzCLI/PS** you get the obvious support for the tools, but, if your custom code goes wrong, you're on your own and it will be mostly your custom code that will fail as there is so much more to write to achieve what the tools above achieve naturally.
 
 ### Error handling/Plan/Clean up
 
@@ -465,8 +483,8 @@ From **Terraform** you can invoke commands locally (including **PowerShell/Bash*
 
 This is all managed for your by all the tools, except **CLI/PS** where you have to look after this yourself; write conditional code and specify retries and what to do if it all goes bad.
 
-###### This is a live article, I will try and keep it up to date with the new development and to complete the missing bits, if you want to suggest a change, please submit a pull request to [this](https://github.com/UnoSD/Blog) repository.
+**I will soon publish a repository on GitHub with working examples in each language**
 
-###### Opinions expressed are solely my own and do not express the views or opinions of my employer
+###### This is a live article, I will try and keep it up to date with the new development and to complete the missing bits, if you want to suggest a change, please submit a pull request to [this](https://github.com/UnoSD/Blog/blob/master/Infrastructure%20as%20code%20in%202021/article.md) repository.
 
 ###### Cover image: "A visual representation of the DevOps workflow" by [Kharnagy](https://commons.wikimedia.org/wiki/User:Kharnagy) (edited) is licensed under CC BY-SA 4.0, .
