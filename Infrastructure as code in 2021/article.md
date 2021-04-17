@@ -11,6 +11,8 @@ This article is **Azure-centric**, but most of what will be discussed will also 
 
 **The code examples below all deploy exactly the same resources**
 
+Full working examples on **GitHub** [here](https://github.com/UnoSD/IaC)
+
 ---
 
 ## ARM templates
